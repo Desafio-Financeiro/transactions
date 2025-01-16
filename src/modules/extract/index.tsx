@@ -8,6 +8,7 @@ import { getTransactionListRequest } from "../../services/transactions";
 import { Transaction } from "../../@types/transaction";
 import { groupTransactionsByMonth } from "./helpers/groupTransactionsByMonth";
 import { withTheme } from "../../withTheme";
+import { ComponentFallBack } from "./components/fallback";
 
 const operationTypeMapper = {
   Debit: "Débito",
@@ -37,25 +38,9 @@ function ExtractComponent() {
     transactionResponse?.data.slice(0, LIST_SIZE)
   );
 
-  if (isLoading)
-    return (
-      <Card type="default" sx={{ width: "282px" }}>
-        <Typography variant="h5" sx={{ marginBottom: "16px" }}>
-          Extrato
-        </Typography>
-        Carregando...
-      </Card>
-    );
+  if (isLoading) return <ComponentFallBack message="Carregando..." />;
 
-  if (error)
-    return (
-      <Card type="default" sx={{ width: "282px" }}>
-        <Typography variant="h5" sx={{ marginBottom: "16px" }}>
-          Extrato
-        </Typography>
-        Erro ao carregar
-      </Card>
-    );
+  if (error) return <ComponentFallBack message="Erro ao carregar" />;
 
   return (
     <Card type="default" sx={{ width: "282px" }}>

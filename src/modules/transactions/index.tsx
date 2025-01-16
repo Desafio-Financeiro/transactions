@@ -1,11 +1,24 @@
 import { Card } from "fiap-financeiro-ds";
+import { TableData } from "./components/table-data";
+import { Transaction } from "../../@types/transaction";
+import useSWR from "swr";
+import { getTransactionListRequest } from "../../services/transactions";
+import { withTheme } from "../../withTheme";
 
-interface TransactionsProps {
-  list: any;
+function createData({ id, accountId, type, value, date }: Transaction) {
+  return { id, accountId, type, value, date };
 }
 
-export default function Transactions({ list }: TransactionsProps) {
-  console.log("Dados", list);
+function TransactionsComponent() {
+  const { data: transactionResponse } = useSWR(
+    {
+      url: `/transactions`,
+      headers: {},
+    },
+    getTransactionListRequest
+  );
+
+  const rows = transactionResponse?.data.map((d: Transaction) => createData(d));
 
   return (
     <Card
@@ -16,18 +29,15 @@ export default function Transactions({ list }: TransactionsProps) {
         minHeight: "calc(100vh - 144px)",
       }}
     >
-      TRANSACOES
-      {list.length > 0 ? (
-        <div>
-          {list.map((t: any) => (
-            <p key={t.id}>
-              {t.type} - {t.value}
-            </p>
-          ))}
-        </div>
+      {rows?.length > 0 ? (
+        <TableData data={rows} />
       ) : (
         <span>Não foram encontradas transações para essa conta</span>
       )}
     </Card>
   );
 }
+
+const Transactions = withTheme(TransactionsComponent);
+
+export default Transactions;
