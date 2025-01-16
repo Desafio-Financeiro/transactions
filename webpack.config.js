@@ -3,32 +3,32 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 module.exports = {
-  entry: "./src/index.tsx", // Ponto de entrada principal
+  entry: "./src/index.tsx",
   output: {
-    path: path.resolve(__dirname, "dist"), // Pasta de saída
-    filename: "bundle.js", // Nome do arquivo gerado
-    clean: true, // Limpa a pasta dist antes de cada build
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js",
+    clean: true,
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx"], // Extensões suportadas
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
   },
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/, // Processa arquivos TypeScript e TSX
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
         use: "ts-loader",
       },
       {
-        test: /\.css$/, // Processa arquivos CSS
+        test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./index.html", // Modelo do HTML
-      filename: "index.html", // Nome do arquivo gerado
+      template: "./index.html",
+      filename: "index.html",
     }),
     new ModuleFederationPlugin({
       name: "transactionsApp",
@@ -48,13 +48,19 @@ module.exports = {
         "fiap-financeiro-ds": {
           singleton: true,
         },
+        axios: {
+          singleton: true,
+        },
+        "@material-ui": {
+          singleton: true,
+        },
       },
     }),
   ],
   devServer: {
-    static: path.join(__dirname, "dist"), // Servir arquivos da pasta dist
-    port: 3002, // Porta do servidor de desenvolvimento
-    open: true, // Abre o navegador automaticamente
+    static: path.join(__dirname, "dist"),
+    port: 3002,
+    open: false,
   },
-  mode: "development", // Define o modo como desenvolvimento
+  mode: "development",
 };
