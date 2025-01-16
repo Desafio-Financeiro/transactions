@@ -1,33 +1,144 @@
-import { Card } from "fiap-financeiro-ds";
+import { ptBR } from "date-fns/locale";
+import { Card, Button, formatCurrency } from "fiap-financeiro-ds";
+import { format } from "date-fns";
+import { Box, Stack, Typography } from "@mui/material";
 
-interface ExtractProps {
-  list: any;
-}
+import useSWR from "swr";
+import { getTransactionListRequest } from "../../services/transactions";
+import { Transaction } from "../../@types/transaction";
+import { groupTransactionsByMonth } from "./helpers/groupTransactionsByMonth";
+import { withTheme } from "../../withTheme";
 
-export default function Extract({ list }: ExtractProps) {
-  console.log("Dados", list);
+const operationTypeMapper = {
+  Debit: "Débito",
+  Credit: "Crédito",
+};
+
+const LIST_SIZE = 8;
+
+function ExtractComponent() {
+  function toTransactionPage() {
+    window.location.href = "/transactions";
+  }
+
+  const {
+    data: transactionResponse,
+    isLoading,
+    error,
+  } = useSWR(
+    {
+      url: `/transactions`,
+      headers: {},
+    },
+    getTransactionListRequest
+  );
+
+  const groupedByMonth = groupTransactionsByMonth(
+    transactionResponse?.data.slice(0, LIST_SIZE)
+  );
+
+  if (isLoading)
+    return (
+      <Card type="default" sx={{ width: "282px" }}>
+        <Typography variant="h5" sx={{ marginBottom: "16px" }}>
+          Extrato
+        </Typography>
+        Carregando...
+      </Card>
+    );
+
+  if (error)
+    return (
+      <Card type="default" sx={{ width: "282px" }}>
+        <Typography variant="h5" sx={{ marginBottom: "16px" }}>
+          Extrato
+        </Typography>
+        Erro ao carregar
+      </Card>
+    );
 
   return (
-    <Card
-      type="default"
-      sx={{
-        flex: 1,
-        overflow: "auto",
-        minHeight: "calc(100vh - 144px)",
-      }}
-    >
-      EXTRATO
-      {list.length > 0 ? (
-        <div>
-          {list.map((t: any) => (
-            <p key={t.id}>
-              {t.type} - {t.value}
-            </p>
-          ))}
-        </div>
-      ) : (
+    <Card type="default" sx={{ width: "282px" }}>
+      <Typography variant="h5" sx={{ marginBottom: "16px" }}>
+        Extrato
+      </Typography>
+
+      {(!groupedByMonth || groupedByMonth.length === 0) && (
         <span>Não foram encontradas transações para essa conta</span>
+      )}
+
+      {groupedByMonth.map((group: any, i: number) => (
+        <Box
+          key={group.monthNumber + group.year + i}
+          sx={{
+            marginBottom: "16px",
+          }}
+        >
+          <Typography
+            color="primary.dark"
+            fontWeight={600}
+            textTransform="capitalize"
+          >
+            {ptBR.localize.month(group.monthNumber)}
+          </Typography>
+          <>
+            {group.transactions.map((transaction: Transaction) => {
+              const isTransfer = transaction.type === "Debit";
+
+              return (
+                <Stack
+                  sx={{
+                    marginBottom: "10px",
+                    borderBottom: "1px solid",
+                    borderColor: "primary.dark",
+                    paddingY: "8px",
+                  }}
+                  key={transaction.id}
+                >
+                  <Stack
+                    direction="row"
+                    sx={{
+                      marginBottom: "8px",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography fontSize={13} textTransform="capitalize">
+                      {operationTypeMapper[transaction.type]}
+                    </Typography>
+                    <Typography fontSize={13}>
+                      {format(new Date(transaction.date), "dd/MM/yyyy")}
+                    </Typography>
+                  </Stack>
+
+                  <Typography
+                    sx={{
+                      fontWeight: 400,
+                      fontSize: "13px",
+                      color: isTransfer ? "error.main" : "success.main",
+                    }}
+                  >
+                    R$ {formatCurrency(transaction.value.toString())}
+                  </Typography>
+                </Stack>
+              );
+            })}
+          </>
+        </Box>
+      ))}
+
+      {groupedByMonth && groupedByMonth.length > LIST_SIZE && (
+        <Button
+          label="Ver mais"
+          variant="outlined"
+          color="tertiary"
+          onClick={toTransactionPage}
+        />
       )}
     </Card>
   );
 }
+
+const Extract = withTheme(ExtractComponent);
+
+export default Extract;
