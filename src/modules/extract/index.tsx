@@ -9,6 +9,8 @@ import { Transaction } from "../../@types/transaction";
 import { groupTransactionsByMonth } from "./helpers/groupTransactionsByMonth";
 import { withTheme } from "../../withTheme";
 import { ComponentFallBack } from "./components/fallback";
+import { useEffect } from "react";
+import { CustomEventsEnum } from "../../@types/custom-events";
 
 const operationTypeMapper = {
   Debit: "Débito",
@@ -18,14 +20,11 @@ const operationTypeMapper = {
 const LIST_SIZE = 8;
 
 function ExtractComponent() {
-  function toTransactionPage() {
-    window.location.href = "/transactions";
-  }
-
   const {
     data: transactionResponse,
     isLoading,
     error,
+    mutate,
   } = useSWR(
     {
       url: `/transactions`,
@@ -33,6 +32,22 @@ function ExtractComponent() {
     },
     getTransactionListRequest
   );
+
+  useEffect(() => {
+    document.addEventListener(CustomEventsEnum.TRANSACTION_CREATED, () => {
+      mutate();
+    });
+
+    return () => {
+      document.removeEventListener(CustomEventsEnum.TRANSACTION_CREATED, () => {
+        mutate();
+      });
+    };
+  }, []);
+
+  function toTransactionPage() {
+    window.location.href = "/transactions";
+  }
 
   const groupedByMonth = groupTransactionsByMonth(
     transactionResponse?.data.slice(0, LIST_SIZE)
