@@ -5,7 +5,7 @@ import { ToastProps } from "fiap-financeiro-ds/dist/toast";
 
 export const useDeleteTransaction = () => {
   const { trigger: deleteTransactionMutation, isMutating } = useSWRMutation(
-    "/api/transacao",
+    "/transactions",
     deleteTransactionService
   );
 
