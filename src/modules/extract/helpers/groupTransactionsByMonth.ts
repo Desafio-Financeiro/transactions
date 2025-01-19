@@ -22,7 +22,7 @@ export function groupTransactionsByMonth(
     groupedByMonth.get(monthKey)!.transactions.push(transaction);
   });
 
-  return Array.from(groupedByMonth.values())
-    .sort((a, b) => b.year - a.year || a.monthNumber - b.monthNumber)
-    .reverse();
+  return Array.from(groupedByMonth.values()).sort(
+    (a, b) => b.year - a.year || a.monthNumber - b.monthNumber
+  );
 }

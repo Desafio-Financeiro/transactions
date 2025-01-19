@@ -51,7 +51,7 @@ function ExtractComponent() {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )
       .slice(0, LIST_SIZE)
-  );
+  ).reverse();
 
   if (isLoading) return <ComponentFallBack message="Carregando..." />;
 

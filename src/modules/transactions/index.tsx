@@ -5,20 +5,24 @@ import useSWR from "swr";
 import { getTransactionListRequest } from "../../services/transactions";
 import { withTheme } from "../../withTheme";
 
-function createData({ id, accountId, type, value, date }: Transaction) {
-  return { id, accountId, type, value, date };
+function createData({ id, userId, type, value, createdAt }: Transaction) {
+  return { id, userId, type, value, createdAt };
 }
 
 function TransactionsComponent() {
   const { data: transactionResponse } = useSWR(
     {
-      url: `/transactions`,
-      headers: {},
+      url: `/transactions?userId=1`,
     },
     getTransactionListRequest
   );
 
-  const rows = transactionResponse?.data.map((d: Transaction) => createData(d));
+  const rows = transactionResponse?.data
+    .sort(
+      (a: Transaction, b: Transaction) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .map((d: Transaction) => createData(d));
 
   return (
     <Card
