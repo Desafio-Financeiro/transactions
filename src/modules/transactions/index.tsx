@@ -4,13 +4,15 @@ import { Transaction } from "../../@types/transaction";
 import useSWR from "swr";
 import { getTransactionListRequest } from "../../services/transactions";
 import { withTheme } from "../../withTheme";
+import { useEffect } from "react";
+import { CustomEventsEnum } from "../../@types/custom-events";
 
 function createData({ id, userId, type, value, createdAt }: Transaction) {
   return { id, userId, type, value, createdAt };
 }
 
 function TransactionsComponent() {
-  const { data: transactionResponse } = useSWR(
+  const { data: transactionResponse, mutate } = useSWR(
     {
       url: `/transactions?userId=1`,
     },
@@ -23,6 +25,26 @@ function TransactionsComponent() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
     .map((d: Transaction) => createData(d));
+
+  useEffect(() => {
+    document.addEventListener(CustomEventsEnum.TRANSACTION_UPDATED, () => {
+      mutate();
+    });
+
+    document.addEventListener(CustomEventsEnum.TRANSACTION_REMOVED, () => {
+      mutate();
+    });
+
+    return () => {
+      document.removeEventListener(CustomEventsEnum.TRANSACTION_UPDATED, () => {
+        mutate();
+      });
+
+      document.removeEventListener(CustomEventsEnum.TRANSACTION_REMOVED, () => {
+        mutate();
+      });
+    };
+  }, []);
 
   return (
     <Card

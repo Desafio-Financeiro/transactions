@@ -6,6 +6,7 @@ import type {
   TransactionTypes,
 } from "../../../@types/transaction";
 import { updateTransaction } from "../../../services/transactions";
+import { CustomEventsEnum } from "../../../@types/custom-events";
 
 export const useEditTransaction = () => {
   const { trigger: updateTransactionMutation, isMutating } = useSWRMutation(
@@ -39,6 +40,11 @@ export const useEditTransaction = () => {
         type: "success",
         content: "Transação editada com sucesso!",
       });
+
+      const transactionUpdated = new CustomEvent(
+        CustomEventsEnum.TRANSACTION_UPDATED
+      );
+      document.dispatchEvent(transactionUpdated);
 
       handleClose();
     } catch (error) {
