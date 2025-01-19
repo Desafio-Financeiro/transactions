@@ -28,7 +28,7 @@ export function EditModal({ open, handleClose, transaction }: EditModalProps) {
   function handleEditTransaction() {
     if (!transactionType || !transaction?.id) return;
 
-    editTransaction(transaction.id, value, transactionType, handleClose);
+    editTransaction(value, transactionType, transaction, handleClose);
   }
 
   return (

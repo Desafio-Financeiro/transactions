@@ -29,8 +29,8 @@ export function TransactionForm({
   const transactionTypes = {
     values: ["Débito", "Crédito"],
     options: [
-      { value: "Debit", label: "Débito" },
-      { value: "Credit", label: "Crédito" },
+      { value: "deposito", label: "Depósito" },
+      { value: "saque", label: "Transferência" },
     ],
   };
 

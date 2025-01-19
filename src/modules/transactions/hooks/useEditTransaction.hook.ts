@@ -1,12 +1,15 @@
 import { ToastProps } from "fiap-financeiro-ds/dist/toast";
 import { useState } from "react";
 import useSWRMutation from "swr/mutation";
-import type { TransactionTypes } from "../../../@types/transaction";
+import type {
+  Transaction,
+  TransactionTypes,
+} from "../../../@types/transaction";
 import { updateTransaction } from "../../../services/transactions";
 
 export const useEditTransaction = () => {
   const { trigger: updateTransactionMutation, isMutating } = useSWRMutation(
-    "/api/transacao",
+    "/transactions",
     updateTransaction
   );
 
@@ -19,14 +22,14 @@ export const useEditTransaction = () => {
   );
 
   const editTransaction = async (
-    transactionId: string,
     value: number | string,
     transactionType: TransactionTypes,
+    transaction: Transaction,
     handleClose: VoidFunction
   ) => {
     try {
       await updateTransactionMutation({
-        id: transactionId,
+        ...transaction,
         value: Number(value),
         type: transactionType,
       });
