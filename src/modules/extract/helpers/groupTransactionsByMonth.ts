@@ -6,7 +6,7 @@ export function groupTransactionsByMonth(
   const groupedByMonth = new Map<string, GroupedTransaction>();
 
   transactions?.forEach((transaction) => {
-    const date = new Date(transaction.date);
+    const date = new Date(transaction.createdAt);
     const month = date.getMonth();
     const year = date.getFullYear();
     const monthKey = `${year}-${month}`;
@@ -22,7 +22,7 @@ export function groupTransactionsByMonth(
     groupedByMonth.get(monthKey)!.transactions.push(transaction);
   });
 
-  return Array.from(groupedByMonth.values()).sort(
-    (a, b) => b.year - a.year || a.monthNumber - b.monthNumber
-  );
+  return Array.from(groupedByMonth.values())
+    .sort((a, b) => b.year - a.year || a.monthNumber - b.monthNumber)
+    .reverse();
 }
