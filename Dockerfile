@@ -7,7 +7,7 @@ COPY package*.json .
 RUN npm install
 
 COPY . .
-RUN ls -lah
+COPY .env.example .env
 
 EXPOSE 3002 
 
