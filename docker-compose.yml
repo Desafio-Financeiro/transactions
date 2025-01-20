@@ -1,11 +1,11 @@
 services:
   transactions-app:
+    environment:
+      NODE_ENV: development
+      PUBLIC_BASE_URL: "http://localhost:8080"
     build: .
     ports:
       - "3002:3002"
     volumes:
       - .:/app
       - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      - PUBLIC_BASE_URL=http://localhost:8080
