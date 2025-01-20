@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+const { EnvironmentPlugin } = require("webpack");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -26,6 +27,10 @@ module.exports = {
     ],
   },
   plugins: [
+    new EnvironmentPlugin({
+      NEXT_PUBLIC_BASE_URL:
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080",
+    }),
     new HtmlWebpackPlugin({
       template: "./index.html",
       filename: "index.html",
