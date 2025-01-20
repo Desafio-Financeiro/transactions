@@ -30,9 +30,13 @@ export const useEditTransaction = () => {
   ) => {
     try {
       await updateTransactionMutation({
-        ...transaction,
-        value: Number(value),
-        type: transactionType,
+        data: {
+          userId: transaction.userId,
+          id: transaction.id,
+          value: Number(value),
+          type: transactionType,
+          createdAt: transaction.createdAt,
+        },
       });
 
       setToastProps({

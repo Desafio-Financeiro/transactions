@@ -22,16 +22,20 @@ export const updateTransaction = async (
     arg,
   }: {
     arg: {
-      id: string;
-      type: string;
-      value: number;
+      data: {
+        userId: string;
+        id: string;
+        type: string;
+        value: number;
+        createdAt: string;
+      };
     };
   }
 ) => {
   await http({
     method: "PUT",
-    url: `${url}/${arg.id}`,
-    data: JSON.stringify(arg),
+    url: `${url}/${arg.data.id}`,
+    data: JSON.stringify(arg.data),
   });
 };
 
