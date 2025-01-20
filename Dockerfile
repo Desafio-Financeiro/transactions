@@ -7,6 +7,7 @@ COPY package*.json .
 RUN npm install
 
 COPY . .
+RUN ls -lah
 
 EXPOSE 3002 
 
