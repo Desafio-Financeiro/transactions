@@ -1,7 +1,7 @@
 services:
   transactions-app:
     env_file:
-      - .env
+      - .env.example
     build: .
     ports:
       - "3002:3002"
