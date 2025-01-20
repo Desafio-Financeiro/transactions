@@ -1,9 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const { EnvironmentPlugin } = require("webpack");
-
-const DEV_MODE = process.env.NODE_ENV !== "production";
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -29,13 +27,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new EnvironmentPlugin({
-      NEXT_PUBLIC_BASE_URL:
-        process.env.NEXT_PUBLIC_BASE_URL ||
-        (DEV_MODE
-          ? "http://localhost:8080/"
-          : "https://json-server-api-mu.vercel.app"),
-    }),
+    new Dotenv(),
     new HtmlWebpackPlugin({
       template: "./index.html",
       filename: "index.html",
