@@ -14,15 +14,11 @@ import { useState } from "react";
 import { DeleteModal } from "../delete-modal";
 import type { Transaction } from "../../../../@types/transaction";
 import { formatDate } from "../../helpers/formatDate";
+import { operationTypeMapper } from "../../../constants";
 
 interface TableDataProps {
   data: Transaction[];
 }
-
-const operationTypeMapper = {
-  Debit: "Débito",
-  Credit: "Crédito",
-};
 
 export function TableData({ data }: TableDataProps) {
   const { palette } = useTheme();
@@ -32,7 +28,7 @@ export function TableData({ data }: TableDataProps) {
     useState<Transaction | null>(null);
 
   function generateOperationTypeIcon(operationType: string) {
-    if (operationType === "Credit")
+    if (operationType === "deposito")
       return (
         <Icons
           name={"mdiBankTransferIn"}
@@ -78,7 +74,6 @@ export function TableData({ data }: TableDataProps) {
         <TableHead>
           <TableRow>
             <TableCell />
-            <TableCell>id</TableCell>
             <TableCell>Transação</TableCell>
             <TableCell>Valor</TableCell>
             <TableCell>Data</TableCell>
@@ -96,12 +91,11 @@ export function TableData({ data }: TableDataProps) {
               }}
             >
               <TableCell>{generateOperationTypeIcon(row.type)}</TableCell>
-              <TableCell>{row.id}</TableCell>
 
               <TableCell>{operationTypeMapper[row.type]}</TableCell>
               <TableCell>{formatCurrency(String(row.value ?? 0))}</TableCell>
 
-              <TableCell>{formatDate(row.date, "full")}</TableCell>
+              <TableCell>{formatDate(row.createdAt, "full")}</TableCell>
               <TableCell>
                 <Button
                   onClick={() =>
@@ -109,8 +103,8 @@ export function TableData({ data }: TableDataProps) {
                       id: row.id,
                       type: row.type,
                       value: row.value,
-                      date: row.date,
-                      accountId: row.accountId,
+                      createdAt: row.createdAt,
+                      userId: row.userId,
                     })
                   }
                   label="Detalhes"
@@ -129,8 +123,8 @@ export function TableData({ data }: TableDataProps) {
                       id: row.id,
                       type: row.type,
                       value: row.value,
-                      date: row.date,
-                      accountId: row.accountId,
+                      createdAt: row.createdAt,
+                      userId: row.userId,
                     });
                   }}
                 />

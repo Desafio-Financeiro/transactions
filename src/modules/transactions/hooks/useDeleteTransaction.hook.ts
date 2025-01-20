@@ -2,10 +2,11 @@ import { useState } from "react";
 import useSWRMutation from "swr/mutation";
 import { deleteTransaction as deleteTransactionService } from "../../../services/transactions";
 import { ToastProps } from "fiap-financeiro-ds/dist/toast";
+import { CustomEventsEnum } from "../../../@types/custom-events";
 
 export const useDeleteTransaction = () => {
   const { trigger: deleteTransactionMutation, isMutating } = useSWRMutation(
-    "/api/transacao",
+    "/transactions",
     deleteTransactionService
   );
 
@@ -22,6 +23,11 @@ export const useDeleteTransaction = () => {
       await deleteTransactionMutation({
         id,
       });
+
+      const transactionRemoved = new CustomEvent(
+        CustomEventsEnum.TRANSACTION_REMOVED
+      );
+      document.dispatchEvent(transactionRemoved);
 
       setToastProps({
         type: "success",

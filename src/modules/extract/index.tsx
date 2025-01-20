@@ -5,21 +5,20 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import useSWR from "swr";
 import { getTransactionListRequest } from "../../services/transactions";
-import { Transaction } from "../../@types/transaction";
+import { GroupedTransaction, Transaction } from "../../@types/transaction";
 import { groupTransactionsByMonth } from "./helpers/groupTransactionsByMonth";
 import { withTheme } from "../../withTheme";
 import { ComponentFallBack } from "./components/fallback";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CustomEventsEnum } from "../../@types/custom-events";
-
-const operationTypeMapper = {
-  Debit: "Débito",
-  Credit: "Crédito",
-};
+import { operationTypeMapper } from "../constants";
 
 const LIST_SIZE = 8;
 
 function ExtractComponent() {
+  const [groupedByMonth, setGroupedByMonth] = useState<GroupedTransaction[]>(
+    []
+  );
   const {
     data: transactionResponse,
     isLoading,
@@ -27,8 +26,7 @@ function ExtractComponent() {
     mutate,
   } = useSWR(
     {
-      url: `/transactions`,
-      headers: {},
+      url: `/transactions?userId=1`,
     },
     getTransactionListRequest
   );
@@ -49,9 +47,21 @@ function ExtractComponent() {
     window.location.href = "/transactions";
   }
 
-  const groupedByMonth = groupTransactionsByMonth(
-    transactionResponse?.data.slice(0, LIST_SIZE)
-  );
+  useEffect(() => {
+    if (!isLoading && transactionResponse) {
+      setGroupedByMonth(
+        groupTransactionsByMonth(
+          transactionResponse?.data
+            .sort(
+              (a: Transaction, b: Transaction) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
+            .slice(0, LIST_SIZE)
+        ).reverse()
+      );
+    }
+  }, [transactionResponse, isLoading]);
 
   if (isLoading) return <ComponentFallBack message="Carregando..." />;
 
@@ -83,7 +93,7 @@ function ExtractComponent() {
           </Typography>
           <>
             {group.transactions.map((transaction: Transaction) => {
-              const isTransfer = transaction.type === "Debit";
+              const isTransfer = transaction.type === "saque";
 
               return (
                 <Stack
@@ -107,7 +117,7 @@ function ExtractComponent() {
                       {operationTypeMapper[transaction.type]}
                     </Typography>
                     <Typography fontSize={13}>
-                      {format(new Date(transaction.date), "dd/MM/yyyy")}
+                      {format(new Date(transaction.createdAt), "dd/MM/yyyy")}
                     </Typography>
                   </Stack>
 
@@ -127,7 +137,7 @@ function ExtractComponent() {
         </Box>
       ))}
 
-      {groupedByMonth && groupedByMonth.length > LIST_SIZE && (
+      {transactionResponse && transactionResponse.data.length > LIST_SIZE && (
         <Button
           label="Ver mais"
           variant="outlined"

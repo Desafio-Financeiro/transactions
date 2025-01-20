@@ -1,12 +1,12 @@
-export type TransactionTypes = "Debit" | "Credit";
+export type TransactionTypes = "saque" | "deposito";
 
-export type Transaction = {
+export interface Transaction {
+  createdAt: string;
   id: string;
-  accountId: string;
   type: TransactionTypes;
+  userId: string;
   value: number;
-  date: Date;
-};
+}
 
 export type TransactionState = {
   data: Transaction[];

@@ -4,21 +4,47 @@ import { Transaction } from "../../@types/transaction";
 import useSWR from "swr";
 import { getTransactionListRequest } from "../../services/transactions";
 import { withTheme } from "../../withTheme";
+import { useEffect } from "react";
+import { CustomEventsEnum } from "../../@types/custom-events";
 
-function createData({ id, accountId, type, value, date }: Transaction) {
-  return { id, accountId, type, value, date };
+function createData({ id, userId, type, value, createdAt }: Transaction) {
+  return { id, userId, type, value, createdAt };
 }
 
 function TransactionsComponent() {
-  const { data: transactionResponse } = useSWR(
+  const { data: transactionResponse, mutate } = useSWR(
     {
-      url: `/transactions`,
-      headers: {},
+      url: `/transactions?userId=1`,
     },
     getTransactionListRequest
   );
 
-  const rows = transactionResponse?.data.map((d: Transaction) => createData(d));
+  const rows = transactionResponse?.data
+    .sort(
+      (a: Transaction, b: Transaction) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .map((d: Transaction) => createData(d));
+
+  useEffect(() => {
+    document.addEventListener(CustomEventsEnum.TRANSACTION_UPDATED, () => {
+      mutate();
+    });
+
+    document.addEventListener(CustomEventsEnum.TRANSACTION_REMOVED, () => {
+      mutate();
+    });
+
+    return () => {
+      document.removeEventListener(CustomEventsEnum.TRANSACTION_UPDATED, () => {
+        mutate();
+      });
+
+      document.removeEventListener(CustomEventsEnum.TRANSACTION_REMOVED, () => {
+        mutate();
+      });
+    };
+  }, []);
 
   return (
     <Card
