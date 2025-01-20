@@ -20,7 +20,7 @@ function TransactionsComponent() {
   );
 
   const rows = transactionResponse?.data
-    .sort(
+    ?.sort(
       (a: Transaction, b: Transaction) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
