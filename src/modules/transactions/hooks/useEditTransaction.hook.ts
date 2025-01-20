@@ -1,5 +1,5 @@
 import { ToastProps } from "fiap-financeiro-ds/dist/toast";
-import { useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import useSWRMutation from "swr/mutation";
 import type {
   Transaction,
@@ -7,8 +7,15 @@ import type {
 } from "../../../@types/transaction";
 import { updateTransaction } from "../../../services/transactions";
 import { CustomEventsEnum } from "../../../@types/custom-events";
+import { balanceRequest } from "../../../services/balance";
+import useSWR from "swr";
 
 export const useEditTransaction = () => {
+  const { data: balanceData, mutate: refetchBalance } = useSWR(
+    "/balance?userId=1",
+    balanceRequest
+  );
+
   const { trigger: updateTransactionMutation, isMutating } = useSWRMutation(
     "/transactions",
     updateTransaction
@@ -29,6 +36,18 @@ export const useEditTransaction = () => {
     handleClose: VoidFunction
   ) => {
     try {
+      if (
+        Number(balanceData?.data.total) - Number(value) < 0 &&
+        transactionType === "saque"
+      ) {
+        setToastProps({
+          type: "error",
+          content: "Saldo insuficiente",
+          isOpen: true,
+        });
+        return;
+      }
+
       await updateTransactionMutation({
         data: {
           userId: transaction.userId,

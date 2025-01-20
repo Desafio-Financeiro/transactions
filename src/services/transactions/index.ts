@@ -35,7 +35,12 @@ export const updateTransaction = async (
   await http({
     method: "PUT",
     url: `${url}/${arg.data.id}`,
-    data: JSON.stringify(arg.data),
+    data: {
+      userId: arg.data.userId,
+      type: arg.data.type,
+      value: arg.data.value,
+      createdAt: arg.data.createdAt,
+    },
   });
 };
 

@@ -40,6 +40,7 @@ module.exports = {
         "./Transactions": "./src/modules/transactions/index.tsx",
         "./Extract": "./src/modules/extract/index.tsx",
       },
+
       shared: {
         "react-dom": {
           singleton: true,
