@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const { EnvironmentPlugin } = require("webpack");
 
+const DEV_MODE = process.env.NODE_ENV !== "production";
+
 module.exports = {
   entry: "./src/index.tsx",
   output: {
@@ -29,7 +31,10 @@ module.exports = {
   plugins: [
     new EnvironmentPlugin({
       NEXT_PUBLIC_BASE_URL:
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080",
+        process.env.NEXT_PUBLIC_BASE_URL ||
+        (DEV_MODE
+          ? "http://localhost:8080/"
+          : "https://json-server-api-mu.vercel.app"),
     }),
     new HtmlWebpackPlugin({
       template: "./index.html",
