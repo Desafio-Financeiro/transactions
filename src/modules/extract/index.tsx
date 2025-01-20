@@ -5,17 +5,20 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import useSWR from "swr";
 import { getTransactionListRequest } from "../../services/transactions";
-import { Transaction } from "../../@types/transaction";
+import { GroupedTransaction, Transaction } from "../../@types/transaction";
 import { groupTransactionsByMonth } from "./helpers/groupTransactionsByMonth";
 import { withTheme } from "../../withTheme";
 import { ComponentFallBack } from "./components/fallback";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CustomEventsEnum } from "../../@types/custom-events";
 import { operationTypeMapper } from "../constants";
 
 const LIST_SIZE = 8;
 
 function ExtractComponent() {
+  const [groupedByMonth, setGroupedByMonth] = useState<GroupedTransaction[]>(
+    []
+  );
   const {
     data: transactionResponse,
     isLoading,
@@ -44,14 +47,21 @@ function ExtractComponent() {
     window.location.href = "/transactions";
   }
 
-  const groupedByMonth = groupTransactionsByMonth(
-    transactionResponse?.data
-      .sort(
-        (a: Transaction, b: Transaction) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-      .slice(0, LIST_SIZE)
-  ).reverse();
+  useEffect(() => {
+    if (!isLoading && transactionResponse) {
+      setGroupedByMonth(
+        groupTransactionsByMonth(
+          transactionResponse?.data
+            .sort(
+              (a: Transaction, b: Transaction) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
+            .slice(0, LIST_SIZE)
+        ).reverse()
+      );
+    }
+  }, [transactionResponse, isLoading]);
 
   if (isLoading) return <ComponentFallBack message="Carregando..." />;
 
