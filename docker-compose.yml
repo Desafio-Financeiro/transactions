@@ -2,8 +2,6 @@ services:
   transactions-app:
     environment:
       PUBLIC_BASE_URL: "http://localhost:8080"
-    env_file:
-      - /app/.env.local
     build: .
     ports:
       - "3002:3002"
