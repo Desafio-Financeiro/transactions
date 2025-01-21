@@ -14,10 +14,15 @@ Este repositório contém o projeto Transactions App e é um microfrontend remot
 
 Neste projetos centralizamos todas as funcionalidades relacionadas a transações (exceto criação) e extrato da conta:
 
-- Listagem de transações
+- Listagem de transações (com filtros e paginação)
 - Edição de transações
 - Deleção de transações
 - Extrato da conta
+
+<figure>
+    <img src='./filtros.png' />
+    <caption>Listagem de transações com filtros por tipo (transferências ou depósitos)</caption>
+</figure>
 
 Implementamos grande parte da estrutura de comunicação entre os microfrontends neste repositório. A atualização da listagem de transações é executada quando a aplicação recebe um evento customizado vindo do app root (Bank App):
 
