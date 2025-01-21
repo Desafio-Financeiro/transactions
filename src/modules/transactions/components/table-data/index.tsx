@@ -83,7 +83,7 @@ export function TableData({ data }: TableDataProps) {
         </TableHead>
 
         <TableBody>
-          {data.map((row) => (
+          {data?.map((row) => (
             <TableRow
               key={row.id}
               sx={{
