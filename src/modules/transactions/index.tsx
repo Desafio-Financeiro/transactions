@@ -77,7 +77,9 @@ function TransactionsComponent() {
     });
   }
 
-  const rows = transactionResponse?.data.map((d: Transaction) => createData(d));
+  const rows = transactionResponse?.data?.map((d: Transaction) =>
+    createData(d)
+  );
 
   useEffect(() => {
     document.addEventListener(CustomEventsEnum.TRANSACTION_UPDATED, () => {
