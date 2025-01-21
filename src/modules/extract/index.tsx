@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { CustomEventsEnum } from "../../@types/custom-events";
 import { operationTypeMapper } from "../constants";
 
-const LIST_SIZE = 8;
+const LIST_SIZE = 5;
 
 function ExtractComponent() {
   const [groupedByMonth, setGroupedByMonth] = useState<GroupedTransaction[]>(
@@ -26,7 +26,7 @@ function ExtractComponent() {
     mutate,
   } = useSWR(
     {
-      url: `/transactions?userId=1`,
+      url: `/transactions?userId=1&_sort=createdDate&_order=desc&_limit=${LIST_SIZE}`,
     },
     getTransactionListRequest
   );
@@ -50,15 +50,7 @@ function ExtractComponent() {
   useEffect(() => {
     if (!isLoading && transactionResponse) {
       setGroupedByMonth(
-        groupTransactionsByMonth(
-          transactionResponse?.data
-            ?.sort(
-              (a: Transaction, b: Transaction) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-            )
-            .slice(0, LIST_SIZE)
-        ).reverse()
+        groupTransactionsByMonth(transactionResponse?.data).reverse()
       );
     }
   }, [transactionResponse, isLoading]);
