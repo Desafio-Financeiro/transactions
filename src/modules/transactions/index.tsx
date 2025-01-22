@@ -7,7 +7,10 @@ import { getTransactionListRequest } from "../../services/transactions";
 import { withTheme } from "../../withTheme";
 import { useEffect, useState } from "react";
 import { CustomEventsEnum } from "../../@types/custom-events";
-import { Box } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
+
+const PAGE_SIZE = 8;
+
 function createData({ id, userId, type, value, createdAt }: Transaction) {
   return { id, userId, type, value, createdAt };
 }
@@ -18,13 +21,16 @@ function TransactionsComponent() {
     isLast: true,
   });
   const [lastPage, setLastPage] = useState(1);
+  const [type, setType] = useState("");
   const {
     data: transactionResponse,
     mutate,
     isLoading,
   } = useSWR(
     {
-      url: `/transactions?userId=1&_sort=createdDate&_order=desc&_page=${pageInfo.page}&_limit=2`,
+      url: `/transactions?userId=1&_sort=createdDate&_order=desc&_page=${
+        pageInfo.page
+      }&_limit=${PAGE_SIZE}${type ? `&type=${type}` : ""}`,
     },
     getTransactionListRequest,
     {
@@ -77,6 +83,20 @@ function TransactionsComponent() {
     });
   }
 
+  function handleTabChange(value: string) {
+    if (value === "saque") {
+      setType("saque");
+      return;
+    }
+
+    if (value === "deposito") {
+      setType("deposito");
+      return;
+    }
+
+    setType("");
+  }
+
   const rows = transactionResponse?.data?.map((d: Transaction) =>
     createData(d)
   );
@@ -110,8 +130,20 @@ function TransactionsComponent() {
         minHeight: "calc(100vh - 144px)",
       }}
     >
+      <Tabs
+        value={type}
+        onChange={(e, value) => {
+          handleTabChange(value);
+        }}
+        aria-label="Filtro por tipo"
+      >
+        <Tab label="Todos" value="" />
+        <Tab label="Transferências" value="saque" />
+        <Tab label="Depósito" value="deposito" />
+      </Tabs>
+
       {isLoading ? (
-        <span>Carregando...</span>
+        <Box sx={{ padding: "2rem" }}>Carregando...</Box>
       ) : rows?.length > 0 ? (
         <>
           <TableData data={rows} />
@@ -144,7 +176,9 @@ function TransactionsComponent() {
           </Box>
         </>
       ) : (
-        <span>Não foram encontradas transações para essa conta</span>
+        <Box sx={{ padding: "2rem" }}>
+          Não foram encontradas transações para essa conta
+        </Box>
       )}
     </Card>
   );
