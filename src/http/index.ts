@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: process.env.PUBLIC_BASE_URL,
+  baseURL: "https://json-server-api-mu.vercel.app",
 });
 
 export default http;
